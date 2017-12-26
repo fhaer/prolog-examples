@@ -1,3 +1,13 @@
+Vergleiche
+
+versandkosten(Bestellung,Umsatz,0) :- Umsatz>=19.99.
+versandkosten(Bestellung,Umsatz,4.90).
+
+
+
+
+Beispiel zu Geschäftsregeln
+
 Nach einer Bestellung verbleibt ein Kunde im bisherigen Status oder 
 erhält den nächsthöheren Status, sofern eine der folgenden Regeln 
 zutrifft.
@@ -17,3 +27,76 @@ s(AS,_,_,AS).
 
 ermittleNeuenKundenstatus(AlterStatus,UmsatzB,UmsatzJ,NeuerKundenstatus) 
 :- s(AlterStatus,UmsatzB,UmsatzJ,NeuerKundenstatus).
+
+
+
+
+Beispiel zu Zyklen
+
+% Graph
+kante(a,b).
+kante(b,a).
+
+% erreichbar1
+erreichbar1(X,Y) :- kante(X,Z), erreichbar1(Z,Y).
+erreichbar1(X,Y) :- kante(X,Y).
+
+% erreichbar2
+erreichbar2(X,Y) :- kante(X,Y).
+erreichbar2(X,Y) :- kante(X,Z), erreichbar2(Z,Y).
+
+
+
+
+Affe-Banane-Problem
+
+% Aufruf: kann_erhalten(Startzustand). 
+%      => kann_erhalten(zustand(an_tuer,auf_boden,am_fenster,hat_nicht)).
+
+% Ziel:
+kann_erhalten(zustand(_,_,_,hat)).
+
+% Zug von Zustand Z1 nach Z2 mittels beliebiger Aktion:
+kann_erhalten(Z1) :- zug(Z1,_,Z2), kann_erhalten(Z2).
+
+% Zustandsübergänge für alle Aktionen:
+
+% 1. greifen
+zug( zustand(mitte,auf_kiste,mitte,hat_nicht), 
+	 greifen, 
+	 zustand(mitte,auf_kiste,mitte,hat) ).
+
+% 2. klettern
+zug( zustand(P,auf_boden,P,H), 
+	 klettern, 
+	 zustand(P,auf_kiste,P,H) ).
+
+% 3. schieben
+zug( zustand(P1,auf_boden,P1,H), 
+	 schieben(P1,P2), 
+	 zustand(P2,auf_boden,P2,H) ).
+
+% 4. gehen
+zug( zustand(P1,auf_boden,B,H), 
+	 gehen(P1,P2), 
+	 zustand(P2,auf_boden,B,H) ).
+
+
+% Ansatz zur Lösungssuche: 
+
+% Zustand: (an_tuer,auf_boden,am_fenster,hat_nicht)
+% => Match bei 4.
+
+% Zustand: (X,auf_boden,am_fenster,hat_nicht)
+% => Match bei 2. => (...) => fail
+% => Match bei 3.
+% !  Zyklus falls 4. vor 3. ("gehen" nicht vor "schieben" versuchen)
+
+% Zustand: (Y,auf_boden,Y,hat_nicht)
+% => Match bei 2.
+% !  Zyklus falls 3. vor 2. ("schieben" nicht vor "klettern" versuchen)
+
+% Zustand: (Y,auf_kiste,Y,hat_nicht)
+% => Match bei 1.
+
+% Zustand: (mitte,auf_kiste,mitte,hat)
