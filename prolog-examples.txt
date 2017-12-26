@@ -1,0 +1,19 @@
+Nach einer Bestellung verbleibt ein Kunde im bisherigen Status oder 
+erhält den nächsthöheren Status, sofern eine der folgenden Regeln 
+zutrifft.
+
+• Ein Kunde des Status bronze erhält bei einer Bestellung ab 100€ den 
+Status silber.
+• Ein Kunde des Status silber erhält bei einer Bestellung ab 500€ und einem 
+Gesamtumsatz ab 1000€ den Status gold.
+• Ein Kunde des Status gold erhält bei einer Bestellung ab 1000€ oder 
+einem Gesamtumsatz ab 10000€ den Status platin.
+
+s(gold,UB,_,platin)   :- UB>=1000.
+s(gold,_,UJ,platin)    :- UJ>=10000.00.
+s(silber,UB,UJ,gold)   :- UB>=500, UJ>=1000.00.
+s(bronze,UB,UJ,silber) :- UB>=100, UJ>=100.00.
+s(AS,_,_,AS).
+
+ermittleNeuenKundenstatus(AlterStatus,UmsatzB,UmsatzJ,NeuerKundenstatus) 
+:- s(AlterStatus,UmsatzB,UmsatzJ,NeuerKundenstatus).
